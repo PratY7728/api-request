@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books Library</title>
+</head>
+<body>
+
+    <h1>Books Library</h1>
+
+    <button onclick="getBooks()">Get Books</button>
+
+    <h2>Books</h2>
+    <ul id="bookList"></ul>
+    <br/>
+    <hr/>
+    <br/>
+
+    <h2>Add Book</h2>
+    <form onsubmit="addBook(event)">
+        <label for="bookName">Book Name:</label>
+        <input type="text" id="bookName" required>
+        
+        <label for="bookDetails">Details:</label>
+        <input type="number" id="bookDetails" required>
+
+        <button type="submit">Add Book</button>
+    </form>
+
+    <h2>Update Book Details</h2>
+    <form onsubmit="updateBook(event)">
+        <label for="updateBookId">Book ID:</label>
+        <input type="text" id="updateBookId" required>
+
+        <label for="updateBookName">New Book Name:</label>
+        <input type="text" id="updateBookName" required>
+        
+        <label for="updateBookDescription">New Description:</label>
+        <input type="number" id="updateBookDescription" required>
+
+        <button type="submit">Update Book</button>
+    </form>
+
+    <h2>Delete Book</h2>
+    <form onsubmit="deleteBook(event)">
+        <label for="deleteBookId">Book ID:</label>
+        <input type="text" id="deleteBookId" required>
+
+        <button type="submit">Delete Book</button>
+    </form>
+
+    <script>
+        async function getBooks() {
+            const bookList = document.getElementById('bookList');
+            bookList.innerHTML = '';
+
+            const response = await fetch('http://localhost:3000/books');
+            const books = await response.json();
+
+            books.forEach(book => {
+                const li = document.createElement('li');
+                li.textContent = `Name: ${book.name}, Quantity: ${book.quantity}, Price: ${book.price}`;
+                bookList.appendChild(li);
+            });
+            console.log(books)
+        }
+
+        async function addBook(event) {
+            event.preventDefault();
+
+            const bookName = document.getElementById('bookName').value;
+            const bookDetails = document.getElementById('bookDetails').value;
+
+            await fetch('http://localhost:3000/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: bookName,
+                    details: bookDetails,
+                }),
+            });
+
+            getBooks();
+        }
+
+        async function updateBook(event) {
+            event.preventDefault();
+
+            const updateBookId = document.getElementById('updateBookId').value;
+            const updateBookName = document.getElementById('updateBookName').value;
+            const updateBookDetails = document.getElementById('updateBookDetails').value;
+
+            await fetch(`http://localhost:3000/books/${updateBookId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: updateBookName,
+                    details: updateBookDetails,
+                }),
+            });
+
+            getBooks();
+        }
+
+        async function deleteBook(event) {
+            event.preventDefault();
+
+            const deleteBookId = document.getElementById('deleteBookId').value;
+
+            await fetch(`http://localhost:3000/books/${deleteBookId}`, {
+                method: 'DELETE',
+            });
+
+            getBooks();
+        }
+    </script>
+</body>
+</html>
